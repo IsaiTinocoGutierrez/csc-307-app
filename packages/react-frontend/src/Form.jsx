@@ -6,6 +6,7 @@ function Form(props) {
     name: "",
     job: ""
   });
+  
   function handleChange(event) {
     const { name, value } = event.target;
     if (name === "job")
@@ -13,7 +14,13 @@ function Form(props) {
     else setPerson({ name: value, job: person["job"] });
   }
 
-return (
+    // Inside src/Form.jsx (a new inner function)
+  function submitForm() {
+    props.handleSubmit(person);
+    setPerson({ name: "", job: "" });
+  }
+ 
+  return (
     <form>
       <label htmlFor="name">Name</label>
       <input
@@ -31,7 +38,7 @@ return (
         value={person.job}
         onChange={handleChange}
       />
-      <input type="button" value="Submit" onClick={props.submitForm} />
+      <input type="button" value="Submit" onClick={submitForm} />
       </form>
   );
 }
