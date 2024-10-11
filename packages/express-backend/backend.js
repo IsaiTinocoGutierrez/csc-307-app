@@ -33,11 +33,63 @@ const users = {
     ]
   };
 
+  app.use(express.json());
+
+
   const findUserByName = (name) => {
     return users["users_list"].filter(
       (user) => user["name"] === name
     );
   };
+
+  const findUserById = (id) =>
+    users["users_list"].find((user) => user["id"] === id);
+
+  const addUser = (user) => {
+    users["users_list"].push(user);
+    return user;
+  };
+
+  //------------------------------
+//   const deleteUserById = (id) => {
+//     const index = users["users_list"].findIndex((user) => user["id"] === id);
+//     if  (index !== -1) {
+//         users["users_list"].splice(index, 1); // remove user if found
+//         return true;
+//         }
+//     return false;
+//   };
+
+//   // delete route to remove a user by ID
+//   app.delete("/users/:id",  (req, res) => {
+//     const id = req.params.id;
+//     const success = deleteUserById(id);
+//     if (success) {
+//         res.status(200).send(`User with ID ${id} deleted`);
+//         } else {
+//             res.status(404).send(`User with ID ${id} not found`);
+//     }
+//   });
+//----------------------------
+
+//   const findUserByNameAndJob = (name, job) => {
+//     return users["users_list"].filter((user) => user["name"] === name && user["job"] === job
+//     );
+//   };
+
+//   //extend the users route to filter by name and job
+//   app.get("/users", (req, res) => {
+//     const name = req.query.name;
+//     if (name && job) {
+//         let result = findUserByNameAndJob(name, job);
+//         result = {users_list: result};
+//         res.json(result);
+//         } else {
+//             res.send(users); // if not filters, return all users
+//     }
+//   });
+
+//----------------------
 
   app.get("/users", (req, res) => {
     const name = req.query.name;
@@ -50,7 +102,23 @@ const users = {
     }
   });
 
-app.use(express.json());
+  app.get("/users/:id", (req, res) => {
+    const id = req.params["id"]; //or req.params.id
+    let result = findUserById(id);
+    if (result === undefined) {
+      res.status(404).send("Resource not found.");
+    } else {
+      res.send(result);
+    }
+  });
+
+  app.post("/users", (req, res) => {
+    const userToAdd = req.body;
+    addUser(userToAdd);
+    res.send();
+  });
+
+
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
