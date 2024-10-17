@@ -62,20 +62,33 @@ const users = {
     }
     return false;
   };
-  
+
   app.delete("/users/:id", (req, res) => {
     const id = req.params.id;
-    try {
-      if (deleteUserById(id)) {
-        res.status(200).send(`User  with ID ${id} deleted`);
-      } else {
-        res.status(404).send(`User  with ID ${id} not found`);
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(404).send(`User  with ID ${id} not found`);
+  
+    // Try to delete the user by ID
+    const isDeleted = deleteUserById(id);
+  
+    if (isDeleted) {
+      res.status(204).send(); // 204 No Content (successful deletion, no body)
+    } else {
+      res.status(404).json({ message: `User with ID ${id} not found` });
     }
   });
+  
+  // app.delete("/users/:id", (req, res) => {
+  //   const id = req.params.id;
+  //   try {
+  //     if (deleteUserById(id)) {
+  //       res.status(200).send(`User  with ID ${id} deleted`);
+  //     } else {
+  //       res.status(404).send(`User  with ID ${id} not found`);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(404).send(`User  with ID ${id} not found`);
+  //   }
+  // });
 
 //----------------------------
 
@@ -113,13 +126,44 @@ const users = {
     }
   });
 
+  // app.post("/users", (req, res) => {
+  //   const userToAdd = req.body;
+  //   addUser(userToAdd);
+  //   res.send();
+  //   //res.status(201).json({ message: "User created successfully", user: userToAdd})
+  // });
+
+  //----------------------
+// Function to generate a random ID
+  const generateRandomId = () => {
+    return Math.random().toString(36).substr(2, 6); // Generate a random 6-character string
+  };
+
   app.post("/users", (req, res) => {
     const userToAdd = req.body;
-    addUser(userToAdd);
-    res.send();
+  
+     // Optional: Add validation for incoming data (e.g., name, job)
+  if (!userToAdd.name || !userToAdd.job) {
+    return res.status(400).json({ message: "Invalid user data" });
+  }
+
+  // Generate a random ID for the new user
+  const id = generateRandomId();
+
+  // Create a new user object with the ID field first
+  const newUser = {
+   id: id,          // Add the ID first
+    name: userToAdd.name,
+    job: userToAdd.job,
+  };
+
+  // Add the user to the list
+  addUser(newUser);
+
+  // Respond with a 201 status and the newly created user
+  res.status(201).json({ message: "User created successfully", user: userToAdd });
   });
-
-
+//----------------------------
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
