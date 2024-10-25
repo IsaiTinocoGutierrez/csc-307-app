@@ -16,7 +16,7 @@ function MyApp() {
   }, []);
 
   // function postUser(person) {
-  //   const promise = fetch("Http://localhost:8000/users", {
+  //   const promise = fetch("http://localhost:8000/users", {
   //     method: "POST",
   //     headers: {
   //       "Content-Type": "application/json"
@@ -37,18 +37,19 @@ function MyApp() {
     });
   }
 
-  function removeOneCharacter(id) {
+  function removeOneCharacter(_id) {
     // Make a DELETE request to the backend
-    fetch(`http://localhost:8000/users/${id}`, {
+    fetch(`http://localhost:8000/users/${_id}`, {
       method: "DELETE",
     })
       .then((response) => {
+        console.log(`Response from backend:`, response);
         if (response.status === 204) {
           // If the deletion is successful, update the frontend state
-          const updated = characters.filter((character) => character.id !== id);
+          const updated = characters.filter((character) => character._id !== _id);
           setCharacters(updated);
         } else if (response.status === 404) {
-          console.log(`User with ID ${id} not found.`);
+          console.log(`User with ID ${_id} not found.`);
         } else {
           throw new Error(`Failed to delete user. Status code: ${response.status}`);
         }
@@ -73,24 +74,56 @@ function MyApp() {
   //     });
   // }
 
-  function updateList(person) {
-    postUser(person)
-      .then((response) => {
-        // Check if the response status is 201 (Created)
-        if (response.status === 201) {
-          return response.json(); // Parse the JSON response
-        } else {
-          throw new Error(`Failed to create user. Status code: ${response.status}`);
-        }
-      })
-      .then((data) => {
-        // If the user is created successfully, update the state
-        setCharacters([...characters, data.user]);
-      })
-      .catch((error) => {
-        console.log("Error creating user:", error);
-      });
-  }
+  // function updateList(person) {
+  //   postUser(person)
+  //     .then((response) => {
+  //       // Check if the response status is 201 (Created)
+  //       if (response.status === 201) {
+  //         return response.json(); // Parse the JSON response
+  //       } else {
+  //         throw new Error(`Failed to create user. Status code: ${response.status}`);
+  //       }
+  //     })
+  //     .then((data) => {
+  //       // If the user is created successfully, update the state
+  //       setCharacters([...characters, data.user]);
+  //     })
+  //     .catch((error) => {
+  //       console.log("Error creating user:", error);
+  //     });
+  // }
+
+//   function updateList(person) {
+//   postUser(person)
+//     .then(response => response.json()) // Get the newly created user from the backend
+//     .then((data) => {
+//       const newUser = data.user; // Extract the user from the response
+//       setCharacters([...characters, newUser]); // Add the new user to the list (with ID)
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//     });
+// }
+
+// updated
+function updateList(person) {
+  postUser(person)
+    .then((response) => {
+      if (response.status === 201) {
+        return response.json(); // Parse the JSON response
+      } else {
+        throw new Error(`Failed to create user. Status code: ${response.status}`);
+      }
+    })
+    .then((data) => {
+      const newUser = data.user; // Extract the newly created user
+      setCharacters([...characters, newUser]); // Add the new user to the list (with ID)
+    })
+    .catch((error) => {
+      console.log("Error creating user:", error);
+    });
+}
+
 
     function submitForm(person) {
     updateList(person);
